@@ -4,8 +4,8 @@
 
 
 
-#define ANCHO 960
-#define ALTO 549
+#define ANCHO 1280
+#define ALTO 720
 /*La idea es que sea proporcional, no se si esta bien como lo estoy haciendo
 pero por el momento supongo que esta bien */
 #define CAJAY ALTO*0.1 
@@ -28,7 +28,8 @@ void ReadTask(Vector2 posi,Font f,char input[],int *pos){
   while(i < BUFFER){
     char get = GetCharPressed();
     if(input[i] != 0){
-      posi.x += i + 16;
+      Vector2 Fdim = MeasureTextEx(f,&input[i],SIZELETTER,0);
+      posi.x +=  16;
       DrawTextCodepoint(f,input[i],posi,SIZELETTER, RED);
     }
     if(get != 0){
@@ -65,6 +66,11 @@ char *AddTask(char input[]){
   return aux;
 }
 
+void Buttom(Vector2 Bpos,Vector2 Fdim,float radius,float ps,Color col,Font f,char c){
+
+  DrawCircleV(Bpos,radius,col);
+  DrawTextEx(f,&c,Fdim,ps,0,GetColor(BACKGROUND));
+  }
 
 void TaskList(char *tareas[],int index, Font f){
   int LisSep = 70;
@@ -79,10 +85,15 @@ void TaskList(char *tareas[],int index, Font f){
       .height = (float)CAJANLT*1.7,
 
     };
+  int TaskPadding = caja.width *0.25;
+  posi.x += TaskPadding;
+  Vector2 Fdim = MeasureTextEx(f,"a",SIZELETTER,0);
   for(int i = 0;i < index; ++i){
     DrawRectangleRounded(caja,0.25,1, ColorBrightness(GetColor(BACKGROUND), 0.1f));
+    posi.y += Fdim.y/2;
     DrawTextEx(f, tareas[i], posi,(float)SIZELETTER,0, BLUE);
     DrawRectangleRoundedLinesEx(caja,0.25,1,2.5f,GRAY);
+    //printf("%f %f\n",Fdim.x,Fdim.y);
     //int len = StrLen(tareas[i]);
     posi.y += LisSep;
     caja.y = posi.y;
@@ -111,22 +122,48 @@ void InputBar( Rectangle caja, char input[], Vector2 posi, Font f, int *pos){
   Color col = RED;
   DrawRectangleRoundedLinesEx(caja,0.85,1,4.0f,GRAY);
   DrawRectangleRounded(caja,0.6,1, ColorBrightness(GetColor(0x1D2533), 0.1));
-  DrawCircleV(Bpos,radius,col);
+  printf("%f %f\n",caja.x,caja.x+caja.width);
   //Las cosas que hay que hacer por no saber propiamente matematicas
   Fdim.x *= 0.975;
   Fdim.y *= 0.87;
-  DrawTextEx(f,"+",Fdim,radius*1.6,0,GetColor(BACKGROUND));
-  
-  //DrawText("[+]",INPUTBOX,CAJAY + 3,SIZELETTER,BLUE);
+  float PaddinSim = radius*1.6;
+  Buttom(Bpos,Fdim,radius,PaddinSim, col,f,*"+");
+
   posi.y = caja.y;
   ReadTask(posi,f,input,pos);
 
 }
+
+
 //Que cagada hacer ui LPM!!
 //Contador de LPM = 1. Aumente según corresponda
 
-void Interface(){
+void TaskDone(int *contareas,int *completadas){
+  char *t = "Todo Done";
+  
+  }
 
+void Interface(bool *vf,Rectangle caja,char input[],Vector2 posi,Font f,int *pos,
+              char *tareas[],int *contareas){
+
+    DrawText("TODOAPP",CAJAX + CAJANCH/2-16*7/2,CAJAY-15*2,SIZELETTER,BLUE);
+    if(!vf){
+      DrawText("Agregar tarea", 10, CAJAY,SIZELETTER, BLUE);
+    }
+    if(IsKeyPressed(KEY_ENTER)){
+      *vf = !*vf;
+    }
+    if(*vf){
+      InputBar(caja,input,posi,f,pos);
+    }
+    if(!*vf && input[1] != 0){
+      tareas[*contareas] = AddTask(input);
+      *pos = 0;
+      *contareas += 1;
+    }
+    if(*contareas > 0){
+      TaskList(tareas,*contareas,f);
+    }
   }
 
 int main(){
@@ -153,26 +190,9 @@ int main(){
   // Load font from file into GPU memory (VRAM)))
   while(!WindowShouldClose()){
     BeginDrawing();
-    DrawText("TODOAPP",CAJAX + CAJANCH/2-16*7/2,CAJAY-15*2,SIZELETTER,BLUE);
-    if(!vf){
-      DrawText("Agregar tarea", 10, CAJAY,SIZELETTER, BLUE);
-    }
-    if(IsKeyPressed(KEY_ENTER)){
-      vf = !vf;
-    }
-    if(vf){
-      InputBar(caja,input,posi,f,&pos);
-    }
     ClearBackground(GetColor(BACKGROUND));
-    if(!vf && input[1] != 0){
-      tareas[contareas] = AddTask(input);
-      pos = 0;
-      printf("%s\n",tareas[contareas]);
-      contareas ++;
-    }
-    if(contareas > 0){
-      TaskList(tareas,contareas,f);
-    }
+    Interface(&vf,caja,input,posi,f,&pos,
+              tareas, &contareas);
     EndDrawing();
   }
   UnloadFont(f);
