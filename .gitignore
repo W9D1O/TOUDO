@@ -1,0 +1,5 @@
+*.exe
+*.un~
+/Font/
+/lib/
+/include/
