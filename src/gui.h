@@ -20,6 +20,14 @@ pero por el momento supongo que esta bien */
 
 #define GUI_H_
 
+typedef struct Circle{
+          Vector2 center;
+          float radius;
+          float start;
+          float end;
+          int segment;
+          Color colo;
+}Circle;
 
 void ReadTask(Vector2 posi,Font f,char input[],int *pos);
 
@@ -31,9 +39,15 @@ void TaskList(char *tareas[],int index, Font f);
 
 void InputBar( Rectangle caja, char input[], Vector2 posi, Font f, int *pos);
 
-void TaskDone(int *contareas,int *completadas);
+void TaskDone(int *contareas,int *completadas, Font f);
 
 void Interface2(bool *vf,Rectangle caja,char input[],Vector2 posi,Font f,int *pos,
     char *tareas[],int *contareas,int *completadas);
+
+int StrLen(char input[]);
+
+int IntLen(int n);
+
+char *IntToChar(int n);
 
 #endif //GUI_H_

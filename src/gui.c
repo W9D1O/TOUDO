@@ -29,6 +29,7 @@ void ReadTask(Vector2 posi,Font f,char input[],int *pos){
   }
 }
 
+
 int StrLen(char input[]){
   int i = 0;
   while(i < BUFFER && input[i] != '\0'){
@@ -36,6 +37,17 @@ int StrLen(char input[]){
   }
   return i;
 }
+
+
+int IntLen(int n){
+    int cont = 0;
+    while(n != 0){
+        n /= 10;
+        cont ++;
+      }
+      return cont;
+  }
+
 
 //Agrega una tarea a una posicion de un array y de paso va limpiado la cadena
 char *AddTask(char input[]){
@@ -51,10 +63,17 @@ char *AddTask(char input[]){
 }
 
 void Buttom(Vector2 Bpos,Vector2 Fdim,float radius,float ps,Color col,Font f,char c){
-
+  //TODO:Tu continuidad esta por verse
   DrawCircleV(Bpos,radius,col);
   DrawTextEx(f,&c,Fdim,ps,0,GetColor(BACKGROUND));
 }
+
+
+void TaskStatus(){
+  //TODO:Tu impletacion no esta asegurada.
+  }
+
+
 
 void TaskList(char *tareas[],int index, Font f){
   int LisSep = 70;
@@ -63,7 +82,7 @@ void TaskList(char *tareas[],int index, Font f){
     .x =  BOXTASKPOS,
   };
   Rectangle caja = {
-    .x = ANCHO/2-CAJANCH/2*0.85,
+    .x = (float)(ANCHO/2-CAJANCH/2*0.85),
     .y = CAJAY*5.55 + LisSep,
     .width = (float)CAJANCH*0.85,
     .height = (float)CAJANLT*1.7,
@@ -92,7 +111,7 @@ void InputBar( Rectangle caja, char input[], Vector2 posi, Font f, int *pos){
   caja.y += ALTO*0.40;
 
   //Sentencia sacada de ChatGpt, solo se agrego el literal que esta multiplicando
-  float radius =  (ANCHO < ALTO) ? (ANCHO / 2)*0.065 : (ALTO / 2)*0.065;
+  float radius =  (ANCHO < ALTO) ? (float)((ANCHO / 2)*0.065) : (float)((ALTO / 2)*0.065);
   //Ay! dió. Qué poronga es esto. 
   Bpos.y = (caja.y + radius)*0.98;
   //Pero quedo donde quería.
@@ -117,25 +136,64 @@ void InputBar( Rectangle caja, char input[], Vector2 posi, Font f, int *pos){
 
 
 //Que cagada hacer ui LPM!!
-//Contador de LPM = 1. Aumente según corresponda
+//Contador de LPM = 2. Aumente según corresponda
 
-void TaskDone(int *contareas,int *completadas){
+
+//Recibe un numero 
+char *IntToChar(int n){
+  int len = IntLen(n);
+  char *aux = (char *)malloc(len + 1);
+  aux[len] = '\0';
+  while(n != 0){
+      int dig = n % 10;
+      n /= 10;
+      /*48 es el numero que le corresponde a la representacion de cero en el 
+      sistema ascii al sumar dig podemos obtener todos los digitos del 
+      sistema decimal en formato char*/
+      aux[len - 1] = 48 + dig; 
+      len -= 1;
+    }
+  return aux;
+  }
+
+void TaskDone(int *contareas,int *completadas, Font f){
   char *t = "Todo Done";
   Rectangle caja = {
-    .x =  ANCHO/2-CAJANCH*0.85/2,
+    .x =  (float)ANCHO/2-CAJANCH*0.85/2,
     .y = (float)CAJAY-SIZELETTER,
-    .height = (float)ALTO*0.4,
+    .height = (float)ALTO*0.36,
     .width = (float)CAJANCH *0.85
   };
-  //DrawRectangleRounded(caja,0.25,1, ColorBrightness(GetColor(BACKGROUND), 0.1f));
+
+  Circle c = {
+      .center = {
+          .x = caja.x + caja.width*0.75,
+          .y = caja.y + caja.height*0.5,
+        },
+      .radius = caja.height*0.33,
+      .start = 0.f,
+      .end = 360.f,
+      .segment = 100,
+      .colo = RED,
+    };
+  DrawCircleSector(c.center,c.radius, c.start, c.end, c.segment, c.colo);
+
   DrawRectangleRoundedLinesEx(caja,0.25,1,BORDESIZE/2,GetColor(BORDES));
+
+  //Vamos a intentar con la forma mas barata por ahora.
+  //char p[] = completadas + contareas 
+  int len = 0;
+  /*len += StrLen()
+  for(int i = 0; i < len; ++i){
+    DrawTextEx(f, const char *text, Vector2 position, float fontSize, float spacing, Color tint);
+    }*/
 }
 
 void Interface2(bool *vf,Rectangle caja,char input[],Vector2 posi,Font f,int *pos,
     char *tareas[],int *contareas,int *completadas){
 
   DrawText("TODOAPP",CAJAX + CAJANCH/2-16*7/2,CAJAY-15*2,SIZELETTER,BLUE);
-  TaskDone(contareas,completadas);
+  TaskDone(contareas,completadas,f);
   if(!vf){
     DrawText("Agregar tarea", 10, CAJAY,SIZELETTER, BLUE);
   }

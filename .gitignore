@@ -3,3 +3,5 @@
 /Font/
 /lib/
 /include/
+.vscode
+.gitignore

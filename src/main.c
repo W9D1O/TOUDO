@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "./gui.h"
 
-
 int main(){
   bool vf = false; // Esta variable se encarga de que aparesca la caja de escritura
   char input[BUFFER] = {0};
@@ -17,6 +16,7 @@ int main(){
     .height = (float)CAJANLT,
     .width = (float)CAJANCH *0.6
   };
+
   Vector2 posi = {
     
     .y = caja.y + 3.f,
